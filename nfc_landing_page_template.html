@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#e7f1eb" />
+  <title>Your Name | Digital Business Card</title>
+  <style>
+    /* =========================================================
+       QUICK CUSTOMIZATION
+       Change the colors below to match each customer's brand.
+       The links and contact details are edited in the CONFIG
+       section near the bottom of this file.
+       ========================================================= */
+    :root {
+      --page-top: #550765;
+      --page-bottom: #063581;
+      --card: rgba(255, 255, 255, 0.94);
+      --ink: #06173f;
+      --muted: #bfcbea;
+      --accent: #580505;
+      --accent-hover: #07357a;
+      --card-radius: 17px;
+      --page-width: 520px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 16px 36px;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(ellipse at 8% 8%, rgba(255,255,255,.7), transparent 34%),
+        linear-gradient(160deg, var(--page-top), var(--page-bottom));
+    }
+
+    .page {
+      width: 100%;
+      max-width: var(--page-width);
+      margin: 0 auto;
+    }
+
+    .profile {
+      text-align: center;
+      padding: 20px 16px 24px;
+    }
+
+    .avatar-wrap {
+      width: clamp(112px, 31vw, 150px);
+      aspect-ratio: 1;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 5px solid rgba(255,255,255,.92);
+      box-shadow: 0 8px 24px rgba(32, 67, 56, .13);
+      background: linear-gradient(135deg, #d4e9dc, #7eaa9b);
+    }
+
+    .avatar {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .name {
+      margin: 0;
+      font-size: clamp(1.55rem, 5vw, 2rem);
+      line-height: 1.2;
+      font-weight: 750;
+      letter-spacing: -.035em;
+      overflow-wrap: anywhere;
+    }
+
+    .profession {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .bio {
+      max-width: 390px;
+      margin: 12px auto 0;
+      color: var(--muted);
+      font-size: .95rem;
+      line-height: 1.6;
+    }
+
+    .links {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 13px;
+      padding: 0 8px;
+    }
+
+    .link-card {
+      min-height: 66px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 19px;
+      border: 1px solid rgba(41, 79, 66, .08);
+      border-radius: var(--card-radius);
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+      box-shadow: 0 5px 16px rgba(37, 74, 60, .055);
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .link-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 9px 22px rgba(37, 74, 60, .12);
+      background: #fff;
+    }
+
+    .link-card:focus-visible, .close-button:focus-visible, .save-button:focus-visible {
+      outline: 3px solid #78a99b;
+      outline-offset: 3px;
+    }
+
+    .link-icon {
+      display: grid;
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      color: var(--accent);
+    }
+
+    .link-icon svg {
+      display: block;
+      width: 26px;
+      height: 26px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .link-label {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 650;
+      overflow-wrap: anywhere;
+    }
+
+    .link-arrow {
+      color: #92a59e;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .footer {
+      padding: 26px 12px 0;
+      text-align: center;
+      color: rgba(32, 51, 46, .68);
+      font-size: .78rem;
+    }
+
+    .footer a { color: inherit; }
+
+    /* Contact pop-up */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(17, 35, 29, .48);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-backdrop.is-open { display: flex; }
+
+    .modal {
+      width: 100%;
+      max-width: 390px;
+      padding: 27px 23px 22px;
+      border-radius: 23px;
+      background: #fff;
+      box-shadow: 0 22px 70px rgba(0,0,0,.22);
+      text-align: center;
+      animation: pop-in .18s ease-out;
+    }
+
+    @keyframes pop-in {
+      from { opacity: 0; transform: translateY(8px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-avatar {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 12px;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #e1eee7;
+    }
+
+    .modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .modal h2 { margin: 0; font-size: 1.35rem; }
+    .modal p { margin: 7px 0 19px; color: var(--muted); font-size: .92rem; line-height: 1.5; }
+
+    .save-button {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 13px;
+      padding: 15px 18px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .save-button:hover { background: var(--accent-hover); }
+
+    .close-button {
+      margin-top: 12px;
+      border: 0;
+      padding: 9px 14px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .hint { margin: 12px 0 0 !important; font-size: .76rem !important; }
+
+    @media (max-width: 360px) {
+      body { padding: 16px 10px 26px; }
+      .profile { padding: 15px 8px 20px; }
+      .links { padding: 0; gap: 10px; }
+      .link-card { padding: 13px 14px; min-height: 60px; gap: 9px; }
+      .link-label { font-size: .94rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="profile">
+      <div class="avatar-wrap">
+        <!-- Put the customer's image in this folder and name it profile.jpg,
+             or change PROFILE_IMAGE in the CONFIG section below. -->
+        <img class="avatar" id="profileImage" src="profile.jpg" alt="Profile photo"
+             onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width:100%;height:100%;display:grid;place-items:center;color:#315a4d;font-size:2.6rem;font-weight:700&quot;>YN</div>';" />
+      </div>
+      <h1 class="name" id="customerName">Your Name</h1>
+      <p class="profession" id="customerProfession">Your Profession or Business</p>
+      <p class="bio" id="customerBio">A short introduction about you or your business goes here.</p>
+    </header>
+
+    <!-- Buttons are created from the LINKS list in the CONFIG section.
+         Add, remove, or reorder entries there. The spacing adjusts automatically. -->
+    <nav class="links" id="links" aria-label="Contact and social links"></nav>
+
+    <footer class="footer">
+      <span id="footerText">Connect with me</span>
+    </footer>
+  </main>
+
+  <div class="modal-backdrop" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <section class="modal">
+      <div class="modal-avatar">
+        <img id="modalImage" src="profile.jpg" alt="" />
+      </div>
+      <h2 id="modalName">Your Name</h2>
+      <p id="modalProfession">Your Profession or Business</p>
+      <button class="save-button" id="saveContact" type="button">＋ Save Contact to Phone</button>
+      <p class="hint">Downloads a contact card (.vcf) that you can open and save in your phone's Contacts app.</p>
+      <button class="close-button" id="closeModal" type="button">Close</button>
+    </section>
+  </div>
+
+  <script>
+    /* =========================================================
+       CONFIG: EDIT THIS SECTION FOR EACH CUSTOMER
+       1. Change the name, profession, bio, and photo filename.
+       2. Fill in contact details.
+       3. Add or remove links from LINKS.
+       Leave a link's url blank to hide it automatically.
+       ========================================================= */
+    const CONFIG = {
+      name: "Your Name",
+      profession: "Your Profession",
+      bio: "A short introduction about you or your business goes here.",
+      photo: "profile.jpg",
+
+      contact: {
+        firstName: "Your",
+        lastName: "Name",
+        phone: "+63 900 000 0000",
+        email: "hello@example.com",
+        website: "https://example.com",
+        organization: "Your Business",
+        title: "Your Profession",
+        address: "" // Optional, for example: "Iloilo City, Philippines"
+      },
+
+      footer: "Connect with me",
+
+      /* Keep the entries you want, remove the ones you don't need.
+         To add a button, copy one entry and change its label, icon, and URL.
+         Available icon names: contact, facebook, instagram, email, youtube,
+         tiktok, website. Any link with url: "" will not appear. */
+      links: [
+        { label: "Contact Us", icon: "contact", action: "contact", url: "#" },
+        { label: "Call Now", icon: "phone", url: "tel:+639171234567" },
+        { label: "Facebook", icon: "facebook", url: "https://facebook.com/yourpage" },
+        { label: "Instagram", icon: "instagram", url: "https://instagram.com/yourusername" },
+        { label: "Email", icon: "email", url: "mailto:princemo2111@gmail.com" },
+        { label: "Viber", icon: "viber", url: "viber://chat?number=%2B639171234567" },
+        { label: "Telegram", icon: "telegram", url: "https://t.me/yourusername" },
+        { label: "WhatsApp", icon: "whatsapp", url: "https://wa.me/639171234567" },
+        { label: "Discord", icon: "discord", url: "https://discord.gg/yourinvite" },
+        { label: "YouTube", icon: "youtube", url: "https://youtube.com/@yourchannel" },
+        { label: "TikTok", icon: "tiktok", url: "https://tiktok.com/@yourusername" },
+        { label: "Website", icon: "website", url: "https://example.com" }
+      ]
+    };
+
+    const ICONS = {
+      contact: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M6 16c.6-1.8 1.6-2.5 3-2.5s2.4.7 3 2.5M15 9h3M15 13h3"/></svg>',
+      phone: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h3l1.5 4-2 1.5a14 14 0 0 0 5.5 5.5l1.5-2 4 1.5v3c0 1.1-.9 2-2 2C10.5 19 5 13.5 5 5.5c0-1.1.9-2 2-2z"/></svg>',
+      facebook: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 21v-8h3l.5-3H14V8c0-.9.3-1.5 1.6-1.5h2V3.8c-.4-.1-1.5-.2-2.8-.2-2.8 0-4.7 1.7-4.7 4.8V10H7v3h3.1v8"/></svg>',
+      instagram: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.6 6.5h.01"/></svg>',
+      email: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>',
+      viber: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6l-5 3v-3H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M8 8c1 4 3 6 7 7M9 7l2 2-1 1M15 13l2 1-1 2"/></svg>',
+      telegram: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 3-7 18-4-8-8-4 19-6z"/><path d="m11 13 5-5"/></svg>',
+      whatsapp: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.2A8 8 0 1 1 20 11.5z"/><path d="M9 8c.5 2 2 3.5 4 4l1-1 2 1c-.5 2-2 2-4 1-2-1-3-2-4-4-.5-1 0-2 1-2z"/></svg>',
+      discord: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6a16 16 0 0 1 10 0l2 12a15 15 0 0 1-4 2l-1-2H10l-1 2a15 15 0 0 1-4-2L7 6z"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/></svg>',
+      youtube: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="4"/><path d="m10 9 5 3-5 3z"/></svg>',
+      tiktok: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4v10.2a4 4 0 1 1-3-3.9"/><path d="M14 4c.5 2.7 2.2 4.3 5 4.6"/></svg>',
+      website: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3.5 12h17M12 3c2.2 2.4 3.2 5.4 3.2 9S14.2 18.6 12 21c-2.2-2.4-3.2-5.4-3.2-9S9.8 5.4 12 3z"/></svg>'
+    };
+
+    const byId = (id) => document.getElementById(id);
+
+    function applyConfig() {
+      document.title = `${CONFIG.name} | Digital Business Card`;
+      byId("customerName").textContent = CONFIG.name;
+      byId("customerProfession").textContent = CONFIG.profession;
+      byId("customerBio").textContent = CONFIG.bio;
+      byId("footerText").textContent = CONFIG.footer;
+      byId("profileImage").src = CONFIG.photo;
+      byId("modalImage").src = CONFIG.photo;
+      byId("modalName").textContent = CONFIG.name;
+      byId("modalProfession").textContent = CONFIG.profession;
+
+      const linksContainer = byId("links");
+      linksContainer.replaceChildren();
+
+      CONFIG.links
+        .filter(link => link.url && (link.action === "contact" || link.url !== "#"))
+        .forEach(link => {
+          const element = document.createElement("a");
+          element.className = "link-card";
+          element.href = link.action === "contact" ? "#" : link.url;
+          element.setAttribute("aria-label", link.label);
+
+          if (link.action === "contact") {
+            element.addEventListener("click", (event) => {
+              event.preventDefault();
+              openContactModal();
+            });
+          } else if (!link.url.startsWith("mailto:") && !link.url.startsWith("tel:")) {
+            element.target = "_blank";
+            element.rel = "noopener noreferrer";
+          }
+
+          const icon = document.createElement("span");
+          icon.className = "link-icon";
+          icon.innerHTML = ICONS[link.icon] || ICONS.website;
+
+          const label = document.createElement("span");
+          label.className = "link-label";
+          label.textContent = link.label;
+
+          const arrow = document.createElement("span");
+          arrow.className = "link-arrow";
+          arrow.setAttribute("aria-hidden", "true");
+          arrow.textContent = link.action === "contact" ? "+" : "↗";
+
+          element.append(icon, label, arrow);
+          linksContainer.appendChild(element);
+        });
+    }
+
+    function openContactModal() {
+      byId("contactModal").classList.add("is-open");
+      byId("closeModal").focus();
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeContactModal() {
+      byId("contactModal").classList.remove("is-open");
+      document.body.style.overflow = "";
+    }
+
+    function escapeVCard(value = "") {
+      return String(value).replace(/\\/g, "\\\\").replace(/\n/g, "\\n")
+        .replace(/,/g, "\\,").replace(/;/g, "\\;");
+    }
+
+    function downloadVCard() {
+      const c = CONFIG.contact;
+      const lines = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        `N:${escapeVCard(c.lastName)};${escapeVCard(c.firstName)};;;`,
+        `FN:${escapeVCard(CONFIG.name)}`,
+        `ORG:${escapeVCard(c.organization)}`,
+        `TITLE:${escapeVCard(c.title || CONFIG.profession)}`
+      ];
+
+      if (c.phone) lines.push(`TEL;TYPE=CELL:${escapeVCard(c.phone)}`);
+      if (c.email) lines.push(`EMAIL;TYPE=INTERNET:${escapeVCard(c.email)}`);
+      if (c.website) lines.push(`URL:${escapeVCard(c.website)}`);
+      if (c.address) lines.push(`ADR;TYPE=WORK:;;${escapeVCard(c.address)};;;;`);
+      lines.push("END:VCARD");
+
+      const blob = new Blob([lines.join("\r\n")], { type: "text/vcard;charset=utf-8" });
+      const objectUrl = URL.createObjectURL(blob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = objectUrl;
+      downloadLink.download = `${(CONFIG.name || "contact").trim().replace(/[^a-z0-9_-]+/gi, "_")}.vcf`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+    }
+
+    byId("saveContact").addEventListener("click", downloadVCard);
+    byId("closeModal").addEventListener("click", closeContactModal);
+    byId("contactModal").addEventListener("click", (event) => {
+      if (event.target === byId("contactModal")) closeContactModal();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeContactModal();
+    });
+
+    applyConfig();
+  </script>
+</body>
+</html>
